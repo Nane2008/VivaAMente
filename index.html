@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viva a Mente - Gestão de Saúde</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="fundo-detalhes">
+        <div class="blob b-1"></div><div class="blob b-2"></div><div class="blob b-3"></div>
+    </div>
+
+    <div id="login-page" class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>VIVA <span>A</span> MENTE</h1>
+                <p>Cuidado humano, gestão inteligente.</p>
+            </div>
+            <div class="login-buttons">
+                <button onclick="toggleLogin('medico')" class="login-btn active" id="btn-medico">Sou Médico</button>
+                <button onclick="toggleLogin('paciente')" class="login-btn" id="btn-paciente">Sou Paciente</button>
+            </div>
+            <form onsubmit="event.preventDefault(); fazerLogin();">
+                <div class="input-group"><i class="fa-solid fa-user"></i><input type="text" placeholder="Usuário ou CPF" required></div>
+                <div class="input-group" id="group-id" style="display: none;"><i class="fa-solid fa-id-card"></i><input type="text" placeholder="ID (VIVA-XXXX)"></div>
+                <div class="input-group"><i class="fa-solid fa-lock"></i><input type="password" placeholder="Senha" required></div>
+                <button type="submit" class="btn-entrar">Entrar no Sistema</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-wrapper" style="display: none;">
+        <header class="main-header">
+            <div class="logo">VIVA <span>A</span> MENTE</div>
+            <div class="header-right">
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="Avatar">
+                    <span id="user-tag">Médico</span>
+                </div>
+                <button onclick="location.reload()" class="btn-exit"><i class="fa-solid fa-power-off"></i></button>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <aside class="col-left">
+                <section class="glass-card">
+                    <h3><i class="fa-solid fa-users"></i> Pacientes</h3>
+                    <a href="#modal-cadastro" class="btn-action primary"><i class="fa-solid fa-plus"></i> Novo Cadastro</a>
+                    <div id="lista-pacientes"></div>
+                </section>
+                
+                <section class="glass-card section-medico">
+                    <h3><i class="fa-solid fa-comment-medical"></i> Relatos da Família</h3>
+                    <div id="feed-familia" class="feed-container"></div>
+                </section>
+            </aside>
+
+            <section class="col-center">
+                <div class="glass-card main-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h2 id="display-nome-paciente" style="color: var(--primary)">Selecione um Paciente</h2>
+                            <small id="display-id-paciente">ID: ---</small>
+                        </div>
+                        <span class="date-badge">20 de Abril, 2026</span>
+                    </div>
+                    <div class="quick-grid">
+                        <div class="grid-box" onclick="abrirRegistro('Alimentação')"><div class="icon-box ib-blue"><i class="fa-solid fa-utensils"></i></div><span>Alimentação</span></div>
+                        <div class="grid-box" onclick="abrirRegistro('Hidratação')"><div class="icon-box ib-cyan"><i class="fa-solid fa-droplet"></i></div><span>Hidratação</span></div>
+                        <div class="grid-box" onclick="abrirRegistro('Pressão')"><div class="icon-box ib-orange"><i class="fa-solid fa-gauge-high"></i></div><span>Pressão</span></div>
+                        <div class="grid-box" onclick="abrirRegistro('Sintomas')"><div class="icon-box ib-purple"><i class="fa-solid fa-clipboard-list"></i></div><span>Sintomas</span></div>
+                        <div class="grid-box" onclick="abrirRegistro('Notas')"><div class="icon-box ib-green"><i class="fa-solid fa-pen-to-square"></i></div><span>Notas</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="col-right">
+                <section class="glass-card">
+                    <div class="flex-title">
+                        <h3><i class="fa-solid fa-clock"></i> Rotina</h3>
+                        <button class="btn-edit-small section-medico" onclick="location.hash='#modal-rotina'"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="atv-destaque" class="next-event">Clique em um paciente</div>
+                    <a href="#modal-agenda" class="btn-action primary-light">Agenda Completa</a>
+                </section>
+
+                <section class="glass-card">
+                    <h3><i class="fa-solid fa-folder-open"></i> Mídia e Laudos</h3>
+                    <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Subir Laudo</span>
+                        <input type="file" id="file-input" style="display:none" onchange="previewFile(this)" accept="image/*">
+                        <div id="preview-container"></div>
+                    </div>
+                    <div id="historico-laudos" class="mini-galeria"></div>
+                </section>
+            </aside>
+        </main>
+    </div>
+
+    <div id="modal-cadastro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Cadastrar Paciente</h2><a href="#" class="close-modal">&times;</a></div>
+            <form class="modal-body" onsubmit="event.preventDefault(); salvarNovoPaciente();">
+                <input type="text" id="cad-nome" placeholder="Nome Completo" required>
+                <div class="row">
+                    <input type="date" id="cad-data" required>
+                    <input type="number" id="cad-idade" placeholder="Idade" required>
+                </div>
+                <select id="cad-genero" required>
+                    <option value="">Gênero</option><option>Masculino</option><option>Feminino</option><option>Outro</option>
+                </select>
+                <input type="text" id="cad-endereco" placeholder="Endereço">
+                <input type="text" id="cad-contato" placeholder="Contato de Emergência">
+                <button type="submit" class="btn-save">Finalizar Cadastro</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-registro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 id="reg-titulo">Registro</h2><a href="#" class="close-modal">&times;</a></div>
+            <form class="modal-body" id="reg-form"></form>
+        </div>
+    </div>
+
+    <div id="modal-rotina" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Nova Tarefa</h2><a href="#" class="close-modal">&times;</a></div>
+            <form class="modal-body" onsubmit="event.preventDefault(); adicionarTarefa();">
+                <input type="time" id="rot-hora" required>
+                <input type="text" id="rot-atv" placeholder="Ex: Remédio de Pressão" required>
+                <select id="rot-tipo">
+                    <option value="atv">Atividade</option><option value="med">Medicamento</option><option value="food">Refeição</option>
+                </select>
+                <button type="submit" class="btn-save">Salvar na Rotina</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-agenda" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Rotina Diária</h2><a href="#" class="close-modal">&times;</a></div>
+            <div class="modal-body" id="timeline-completa"></div>
+        </div>
+    </div>
+
+    <script>
+        let modo = 'medico';
+        let pacientes = [
+            { 
+                id: "VIVA-8821", nome: "João da Silva", idade: 72, genero: "Masculino", endereco: "Rua das Flores, 123", contato: "(11) 9999-9999",
+                rotina: [
+                    { hora: "08:00", acao: "Remédio Pressão", tipo: "med" },
+                    { hora: "12:00", acao: "Almoço", tipo: "food" }
+                ],
+                relatos: [
+                    { autor: "Filha", texto: "Hoje ele acordou bem disposto.", data: "20/04" }
+                ],
+                laudos: ["https://placehold.co/80x80/0062ff/white?text=Exame+1"]
+            }
+        ];
+        let pacienteAtual = null;
+
+        function toggleLogin(tipo) {
+            modo = tipo;
+            document.getElementById('group-id').style.display = (tipo === 'paciente') ? 'flex' : 'none';
+            document.getElementById('btn-medico').classList.toggle('active', tipo === 'medico');
+            document.getElementById('btn-paciente').classList.toggle('active', tipo === 'paciente');
+        }
+
+        function fazerLogin() {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('dashboard-wrapper').style.display = 'block';
+            document.querySelector('.fundo-detalhes').style.display = 'block';
+            document.getElementById('user-tag').innerText = modo === 'medico' ? 'Médico Responsável' : 'Perfil Familiar';
+            
+            document.querySelectorAll('.section-medico').forEach(el => el.style.display = (modo === 'medico' ? 'block' : 'none'));
+            renderizarPacientes();
+        }
+
+        function renderizarPacientes() {
+            const container = document.getElementById('lista-pacientes');
+            container.innerHTML = pacientes.map(p => `
+                <div class="patient-card" onclick="selecionarPaciente('${p.id}')">
+                    <div class="p-avatar">${p.nome.substring(0,2).toUpperCase()}</div>
+                    <div><p><strong>${p.nome}</strong></p><small>${p.id}</small></div>
+                </div>
+            `).join('');
+        }
+
+        function selecionarPaciente(id) {
+            pacienteAtual = pacientes.find(p => p.id === id);
+            document.getElementById('display-nome-paciente').innerText = pacienteAtual.nome;
+            document.getElementById('display-id-paciente').innerText = `Idade: ${pacienteAtual.idade} anos | ID: ${pacienteAtual.id}`;
+            
+            // Atualiza Rotina
+            const destaque = document.getElementById('atv-destaque');
+            destaque.innerHTML = pacienteAtual.rotina.length > 0 ? `<strong>${pacienteAtual.rotina[0].hora}</strong> - ${pacienteAtual.rotina[0].acao}` : "Sem tarefas";
+            
+            document.getElementById('timeline-completa').innerHTML = pacienteAtual.rotina.map(r => `
+                <div class="time-item ${r.tipo === 'med' ? 'med' : ''}"><span>${r.hora}</span> <p>${r.acao}</p></div>
+            `).join('');
+
+            // Relatos da Família
+            document.getElementById('feed-familia').innerHTML = pacienteAtual.relatos.map(r => `
+                <div class="relato-card"><small>${r.autor} • ${r.data}</small><p>${r.texto}</p></div>
+            `).join('');
+
+            // Laudos
+            document.getElementById('historico-laudos').innerHTML = pacienteAtual.laudos.map(l => `<img src="${l}" class="thumb-laudo">`).join('');
+        }
+
+        function abrirRegistro(tipo) {
+            if(!pacienteAtual) return alert("Selecione um paciente!");
+            const titulo = document.getElementById('reg-titulo');
+            const form = document.getElementById('reg-form');
+            titulo.innerText = "Registrar " + tipo;
+            location.hash = "#modal-registro";
+
+            let html = "";
+            if(tipo === 'Alimentação') {
+                html = `<input type="text" id="r-1" placeholder="O que ele comeu?"><select id="r-2"><option>Comeu tudo</option><option>Parcial</option><option>Recusou</option></select>`;
+            } else if(tipo === 'Pressão') {
+                html = `<div class="row"><input type="number" id="r-1" placeholder="Sistólica (12)"><input type="number" id="r-2" placeholder="Diastólica (8)"></div>`;
+            } else if(tipo === 'Hidratação') {
+                html = `<input type="number" id="r-1" placeholder="Quantidade em ml (ex: 300)">`;
+            } else {
+                html = `<textarea id="r-1" rows="4" placeholder="Escreva os detalhes aqui..."></textarea>`;
+            }
+            form.innerHTML = html + `<button type="button" class="btn-save" onclick="salvarRelato('${tipo}')">Salvar Registro</button>`;
+        }
+
+        function salvarRelato(tipo) {
+            const val1 = document.getElementById('r-1').value;
+            const texto = tipo === 'Pressão' ? `Pressão: ${val1}/${document.getElementById('r-2').value}` : val1;
+            
+            pacienteAtual.relatos.unshift({
+                autor: modo === 'medico' ? 'Médico' : 'Família',
+                texto: `${tipo}: ${texto}`,
+                data: "Hoje"
+            });
+            location.hash = "";
+            selecionarPaciente(pacienteAtual.id);
+        }
+
+        function salvarNovoPaciente() {
+            const novo = {
+                id: "VIVA-" + Math.floor(1000 + Math.random()*9000),
+                nome: document.getElementById('cad-nome').value,
+                idade: document.getElementById('cad-idade').value,
+                genero: document.getElementById('cad-genero').value,
+                rotina: [], relatos: [], laudos: []
+            };
+            pacientes.push(novo);
+            location.hash = "";
+            renderizarPacientes();
+        }
+
+        function adicionarTarefa() {
+            pacienteAtual.rotina.push({
+                hora: document.getElementById('rot-hora').value,
+                acao: document.getElementById('rot-atv').value,
+                tipo: document.getElementById('rot-tipo').value
+            });
+            pacienteAtual.rotina.sort((a,b) => a.hora.localeCompare(b.hora));
+            location.hash = "";
+            selecionarPaciente(pacienteAtual.id);
+        }
+
+        function previewFile(input) {
+            const container = document.getElementById('preview-container');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    container.innerHTML = `<img src="${e.target.result}" class="img-preview">`;
+                    pacienteAtual.laudos.push(e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>
