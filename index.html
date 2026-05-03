@@ -3,286 +3,639 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viva a Mente - Gestão de Saúde</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>VIVA MENTE - Gestão Cognitiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: 800; }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        .hidden-el { display: none !important; }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .emoji-btn { transition: all 0.2s; filter: grayscale(1); opacity: 0.6; }
+        .emoji-btn:hover { transform: scale(1.2); filter: grayscale(0); opacity: 1; }
+        .emoji-btn.active { transform: scale(1.3); filter: grayscale(0); opacity: 1; border: 2px solid #6366f1; background: white; }
+    </style>
 </head>
-<body>
+<body class="bg-[#f8fafc] min-h-screen text-slate-900">
 
-    <div class="fundo-detalhes">
-        <div class="blob b-1"></div><div class="blob b-2"></div><div class="blob b-3"></div>
-    </div>
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] p-10 max-w-md w-full text-center shadow-2xl border border-slate-100">
+            <div class="mb-8">
+                <div class="bg-indigo-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200">
+                    <i class="fas fa-brain text-white text-4xl"></i>
+                </div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tighter uppercase">VIVA MENTE</h1>
+                <p class="text-slate-400 mt-2 font-medium">Gestão em Saúde Cognitiva</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="text-left space-y-3 mb-6">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Usuário</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="clínica@vivamente.com">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Senha</label>
+                        <input type="password" id="login-pass" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="••••••••">
+                    </div>
+                </div>
 
-    <div id="login-page" class="login-page">
-        <div class="login-card">
-            <div class="login-header">
-                <h1>VIVA <span>A</span> MENTE</h1>
-                <p>Cuidado humano, gestão inteligente.</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="app.tryLogin('medico')" class="bg-indigo-600 text-white p-4 rounded-2xl font-bold text-sm hover:bg-indigo-700 transition-all">
+                        Médico
+                    </button>
+                    <button onclick="app.tryLogin('cuidador')" class="bg-emerald-600 text-white p-4 rounded-2xl font-bold text-sm hover:bg-emerald-700 transition-all">
+                        Cuidador
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-4 font-medium italic">Acesso rápido: senha "1234"</p>
             </div>
-            <div class="login-buttons">
-                <button onclick="toggleLogin('medico')" class="login-btn active" id="btn-medico">Sou Médico</button>
-                <button onclick="toggleLogin('paciente')" class="login-btn" id="btn-paciente">Sou Paciente</button>
-            </div>
-            <form onsubmit="event.preventDefault(); fazerLogin();">
-                <div class="input-group"><i class="fa-solid fa-user"></i><input type="text" placeholder="Usuário ou CPF" required></div>
-                <div class="input-group" id="group-id" style="display: none;"><i class="fa-solid fa-id-card"></i><input type="text" placeholder="ID (VIVA-XXXX)"></div>
-                <div class="input-group"><i class="fa-solid fa-lock"></i><input type="password" placeholder="Senha" required></div>
-                <button type="submit" class="btn-entrar">Entrar no Sistema</button>
-            </form>
         </div>
     </div>
 
-    <div id="dashboard-wrapper" style="display: none;">
-        <header class="main-header">
-            <div class="logo">VIVA <span>A</span> MENTE</div>
-            <div class="header-right">
-                <div class="user-info">
-                    <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="Avatar">
-                    <span id="user-tag">Médico</span>
+    <!-- HEADER -->
+    <nav id="main-nav" class="hidden-el bg-white/80 glass border-b border-slate-100 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <div class="bg-indigo-600 p-2 rounded-xl mr-3">
+                        <i class="fas fa-brain text-white text-lg"></i>
+                    </div>
+                    <span class="font-black text-2xl text-slate-800 tracking-tighter">VIVA MENTE</span>
+                    <span id="badge-perfil" class="ml-4 px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-full"></span>
                 </div>
-                <button onclick="location.reload()" class="btn-exit"><i class="fa-solid fa-power-off"></i></button>
-            </div>
-        </header>
-
-        <main class="dashboard-grid">
-            <aside class="col-left">
-                <section class="glass-card">
-                    <h3><i class="fa-solid fa-users"></i> Pacientes</h3>
-                    <a href="#modal-cadastro" class="btn-action primary"><i class="fa-solid fa-plus"></i> Novo Cadastro</a>
-                    <div id="lista-pacientes"></div>
-                </section>
                 
-                <section class="glass-card section-medico">
-                    <h3><i class="fa-solid fa-comment-medical"></i> Relatos da Família</h3>
-                    <div id="feed-familia" class="feed-container"></div>
-                </section>
-            </aside>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center bg-slate-100 rounded-2xl px-4 py-2">
+                        <i class="fas fa-user-circle text-slate-400 mr-2"></i>
+                        <select id="select-global-paciente" onchange="app.switchPaciente(this.value)" class="bg-transparent text-sm font-bold text-slate-700 border-none outline-none cursor-pointer">
+                        </select>
+                    </div>
+                    <button onclick="app.logout()" class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-            <section class="col-center">
-                <div class="glass-card main-card">
-                    <div class="card-header-flex">
-                        <div>
-                            <h2 id="display-nome-paciente" style="color: var(--primary)">Selecione um Paciente</h2>
-                            <small id="display-id-paciente">ID: ---</small>
+    <main class="max-w-7xl mx-auto p-6 lg:p-10">
+        
+        <!-- ÁREA DO MÉDICO -->
+        <div id="area-medico" class="hidden-el space-y-8 animate-pop">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-800">Painel Clínico</h2>
+                    <p class="text-slate-500 font-medium">Gerencie pacientes e acompanhe tratamentos.</p>
+                </div>
+                <button onclick="app.openModal('modal-novo-paciente')" class="bg-indigo-600 text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">
+                    <i class="fas fa-user-plus mr-2"></i> Novo Paciente
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div id="medico-stats" class="space-y-4"></div>
+                <div class="lg:col-span-3 bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 h-[400px]">
+                    <h3 class="font-black text-slate-800 mb-6 flex items-center">
+                        <i class="fas fa-chart-line mr-2 text-indigo-500"></i> Histórico Cognitivo (MMSE)
+                    </h3>
+                    <canvas id="evolucaoChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] card-shadow border border-slate-100 overflow-hidden">
+                <div class="flex border-b border-slate-100 bg-slate-50/50 overflow-x-auto no-scrollbar">
+                    <button id="tab-prescricoes" onclick="app.switchTab('prescricoes')" class="px-8 py-6 text-[10px] font-black uppercase tracking-widest tab-active">Medicamentos</button>
+                    <button id="tab-rotina" onclick="app.switchTab('rotina')" class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600">Plano de Rotina</button>
+                    <button id="tab-exames-med" onclick="app.switchTab('exames-med')" class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600">Resultados Exames</button>
+                    <button id="tab-equipe" onclick="app.switchTab('equipe')" class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600">Equipe de Apoio</button>
+                </div>
+                
+                <div class="p-8">
+                    <div id="view-prescricoes" class="tab-view space-y-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+                                    <tr><th class="pb-4">Medicação</th><th class="pb-4">Dose</th><th class="pb-4">Horário</th><th class="pb-4">Ação</th></tr>
+                                </thead>
+                                <tbody id="medico-prescricoes-body" class="divide-y divide-slate-50"></tbody>
+                            </table>
                         </div>
-                        <span class="date-badge">20 de Abril, 2026</span>
+                        <button onclick="app.openModal('modal-prescricao')" class="bg-indigo-50 text-indigo-600 px-5 py-2.5 rounded-xl text-xs font-black hover:bg-indigo-100">+ Prescrever</button>
                     </div>
-                    <div class="quick-grid">
-                        <div class="grid-box" onclick="abrirRegistro('Alimentação')"><div class="icon-box ib-blue"><i class="fa-solid fa-utensils"></i></div><span>Alimentação</span></div>
-                        <div class="grid-box" onclick="abrirRegistro('Hidratação')"><div class="icon-box ib-cyan"><i class="fa-solid fa-droplet"></i></div><span>Hidratação</span></div>
-                        <div class="grid-box" onclick="abrirRegistro('Pressão')"><div class="icon-box ib-orange"><i class="fa-solid fa-gauge-high"></i></div><span>Pressão</span></div>
-                        <div class="grid-box" onclick="abrirRegistro('Sintomas')"><div class="icon-box ib-purple"><i class="fa-solid fa-clipboard-list"></i></div><span>Sintomas</span></div>
-                        <div class="grid-box" onclick="abrirRegistro('Notas')"><div class="icon-box ib-green"><i class="fa-solid fa-pen-to-square"></i></div><span>Notas</span></div>
+
+                    <div id="view-exames-med" class="tab-view hidden-el">
+                        <div id="medico-exames-lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+
+                    <div id="view-rotina" class="tab-view hidden-el">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div id="medico-rotina-lista" class="space-y-2"></div>
+                            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                <h4 class="font-black text-slate-800 mb-4 uppercase text-xs tracking-widest">Nova Atividade</h4>
+                                <form onsubmit="app.addTask(event)" class="space-y-4">
+                                    <input type="text" id="task-name" required placeholder="Ex: Exercício de Linguagem" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 font-bold text-sm">
+                                    <input type="time" id="task-time" required class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 font-bold text-sm">
+                                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest">Salvar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="view-equipe" class="tab-view hidden-el">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-black text-slate-800 uppercase text-xs tracking-widest">Membros da Equipe</h4>
+                            <button onclick="app.openModal('modal-equipe')" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100">
+                                <i class="fas fa-plus mr-1"></i> Adicionar Profissional
+                            </button>
+                        </div>
+                        <div id="medico-equipe-lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </div>
 
-            <aside class="col-right">
-                <section class="glass-card">
-                    <div class="flex-title">
-                        <h3><i class="fa-solid fa-clock"></i> Rotina</h3>
-                        <button class="btn-edit-small section-medico" onclick="location.hash='#modal-rotina'"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                    <div id="atv-destaque" class="next-event">Clique em um paciente</div>
-                    <a href="#modal-agenda" class="btn-action primary-light">Agenda Completa</a>
-                </section>
-
-                <section class="glass-card">
-                    <h3><i class="fa-solid fa-folder-open"></i> Mídia e Laudos</h3>
-                    <div class="upload-area" onclick="document.getElementById('file-input').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Subir Laudo</span>
-                        <input type="file" id="file-input" style="display:none" onchange="previewFile(this)" accept="image/*">
-                        <div id="preview-container"></div>
-                    </div>
-                    <div id="historico-laudos" class="mini-galeria"></div>
-                </section>
-            </aside>
-        </main>
-    </div>
-
-    <div id="modal-cadastro" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>Cadastrar Paciente</h2><a href="#" class="close-modal">&times;</a></div>
-            <form class="modal-body" onsubmit="event.preventDefault(); salvarNovoPaciente();">
-                <input type="text" id="cad-nome" placeholder="Nome Completo" required>
-                <div class="row">
-                    <input type="date" id="cad-data" required>
-                    <input type="number" id="cad-idade" placeholder="Idade" required>
+        <!-- ÁREA DO CUIDADOR -->
+        <div id="area-cuidador" class="hidden-el space-y-8 animate-pop">
+            <div id="banner-cuidador" class="bg-gradient-to-br from-indigo-600 to-violet-800 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 inline-block">Monitoramento Diário</span>
+                    <h2 class="text-4xl font-black mb-2" id="cuidador-paciente-nome">Paciente</h2>
+                    <p id="cuidador-paciente-info" class="text-indigo-100 font-medium opacity-90"></p>
                 </div>
-                <select id="cad-genero" required>
-                    <option value="">Gênero</option><option>Masculino</option><option>Feminino</option><option>Outro</option>
+                <i class="fas fa-heartbeat absolute right-[-20px] bottom-[-20px] text-white/10 text-[200px]"></i>
+            </div>
+
+            <!-- Registro de Humor (NOVO) -->
+            <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-black text-xl text-slate-800">Como está o paciente agora?</h3>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Feedback Rápido</span>
+                </div>
+                <div class="flex flex-wrap justify-between gap-4 p-4 bg-slate-50 rounded-3xl">
+                    <button onclick="app.selectMood('happy', '😊', 'Estável / Feliz')" class="emoji-btn p-4 rounded-2xl text-3xl" id="mood-happy" title="Estável / Feliz">😊</button>
+                    <button onclick="app.selectMood('confused', '😕', 'Desorientado')" class="emoji-btn p-4 rounded-2xl text-3xl" id="mood-confused" title="Desorientado">😕</button>
+                    <button onclick="app.selectMood('agitated', '😠', 'Agitado')" class="emoji-btn p-4 rounded-2xl text-3xl" id="mood-agitated" title="Agitado">😠</button>
+                    <button onclick="app.selectMood('sleepy', '😴', 'Sonolento')" class="emoji-btn p-4 rounded-2xl text-3xl" id="mood-sleepy" title="Sonolento">😴</button>
+                    <button onclick="app.selectMood('sad', '😢', 'Triste / Apático')" class="emoji-btn p-4 rounded-2xl text-3xl" id="mood-sad" title="Triste / Apático">😢</button>
+                </div>
+                <div id="mood-status" class="mt-4 text-center hidden-el">
+                    <p class="text-sm font-bold text-slate-600">Registrado: <span id="mood-label" class="text-indigo-600"></span></p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="font-black text-2xl text-slate-800">Tarefas de Hoje</h3>
+                            <div id="progresso-diario" class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full tracking-widest uppercase"></div>
+                        </div>
+                        <div id="cuidador-checklist" class="space-y-3"></div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+                        <h3 class="font-black text-2xl text-slate-800 mb-6">Anexar Resultados</h3>
+                        <form onsubmit="app.addExame(event)" class="flex flex-col md:flex-row gap-4">
+                            <input type="text" id="exame-nome" required placeholder="Título do Exame" class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                            <input type="date" id="exame-data" required class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                            <button type="submit" class="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700">Anexar</button>
+                        </form>
+                        <div id="cuidador-exames-lista" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
+                        <h3 class="font-black text-slate-800 mb-6 uppercase text-xs tracking-widest">Equipe</h3>
+                        <div id="cuidador-equipe-lista" class="space-y-3"></div>
+                    </div>
+                    <button onclick="app.openModal('modal-reacao')" class="w-full bg-red-500 text-white p-8 rounded-[2.5rem] shadow-xl shadow-red-100 hover:bg-red-600 transition-all text-left">
+                        <i class="fas fa-phone-alt text-3xl mb-3"></i>
+                        <span class="font-black uppercase tracking-widest text-xs block">Relatar Incidente</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAIS -->
+    <div id="modal-container" class="hidden-el fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+        
+        <!-- Modal Novo Paciente -->
+        <div id="modal-novo-paciente" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-lg p-10 animate-pop">
+            <h3 class="text-3xl font-black mb-2 text-slate-800">Novo Paciente</h3>
+            <p class="text-slate-400 text-sm mb-8 font-medium">Inicie o registro do novo prontuário.</p>
+            <form onsubmit="app.addPaciente(event)" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Nome do Paciente</label>
+                        <input type="text" name="nome" required placeholder="Nome Completo" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Idade</label>
+                        <input type="number" name="idade" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Gravidade</label>
+                        <select name="estagio" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm">
+                            <option>Leve</option>
+                            <option>Moderada</option>
+                            <option>Avançada</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Telefone de Contato (Cuidador/Família)</label>
+                        <input type="tel" name="telefone" required placeholder="(00) 00000-0000" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="app.closeModal()" class="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black text-xs uppercase tracking-widest">Cancelar</button>
+                    <button type="submit" class="flex-2 bg-indigo-600 text-white py-4 px-8 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal Prescrição -->
+        <div id="modal-prescricao" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop">
+            <h3 class="text-2xl font-black mb-6">Prescrever</h3>
+            <form onsubmit="app.addPrescricao(event)" class="space-y-4">
+                <input type="text" name="med" required placeholder="Medicamento" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" name="dose" required placeholder="Dosagem" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                    <input type="time" name="hora" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest">Confirmar</button>
+            </form>
+        </div>
+
+        <!-- Modal Equipe -->
+        <div id="modal-equipe" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop">
+            <h3 class="text-2xl font-black mb-6">Adicionar Profissional</h3>
+            <form onsubmit="app.addMember(event)" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Nome do Profissional</label>
+                    <input type="text" name="nome" required placeholder="Ex: Dr. Roberto Silva" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Especialidade/Cargo</label>
+                    <input type="text" name="cargo" required placeholder="Ex: Nutricionista" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-100">Vincular à Equipe</button>
+                <button type="button" onclick="app.closeModal()" class="w-full py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Voltar</button>
+            </form>
+        </div>
+
+        <!-- Modal Reação -->
+        <div id="modal-reacao" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop">
+            <h3 class="text-2xl font-black text-red-600 mb-6 text-center">Aviso de Emergência</h3>
+            <form onsubmit="app.sendIntercorrencia(event)" class="space-y-4">
+                <select id="inc-tipo" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                    <option>Queda</option>
+                    <option>Agitação Severa</option>
+                    <option>Recusa Alimentar</option>
+                    <option>Esquecimento Súbito</option>
                 </select>
-                <input type="text" id="cad-endereco" placeholder="Endereço">
-                <input type="text" id="cad-contato" placeholder="Contato de Emergência">
-                <button type="submit" class="btn-save">Finalizar Cadastro</button>
+                <textarea id="inc-desc" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm" placeholder="Descrição do evento..."></textarea>
+                <button type="submit" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs">Enviar Notificação</button>
             </form>
         </div>
     </div>
 
-    <div id="modal-registro" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h2 id="reg-titulo">Registro</h2><a href="#" class="close-modal">&times;</a></div>
-            <form class="modal-body" id="reg-form"></form>
-        </div>
-    </div>
-
-    <div id="modal-rotina" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>Nova Tarefa</h2><a href="#" class="close-modal">&times;</a></div>
-            <form class="modal-body" onsubmit="event.preventDefault(); adicionarTarefa();">
-                <input type="time" id="rot-hora" required>
-                <input type="text" id="rot-atv" placeholder="Ex: Remédio de Pressão" required>
-                <select id="rot-tipo">
-                    <option value="atv">Atividade</option><option value="med">Medicamento</option><option value="food">Refeição</option>
-                </select>
-                <button type="submit" class="btn-save">Salvar na Rotina</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-agenda" class="modal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>Rotina Diária</h2><a href="#" class="close-modal">&times;</a></div>
-            <div class="modal-body" id="timeline-completa"></div>
-        </div>
+    <!-- TOAST -->
+    <div id="toast" class="hidden-el fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl flex items-center animate-pop">
+        <i class="fas fa-info-circle text-indigo-400 mr-3"></i>
+        <span id="toast-text" class="text-xs font-black uppercase tracking-widest"></span>
     </div>
 
     <script>
-        let modo = 'medico';
-        let pacientes = [
-            { 
-                id: "VIVA-8821", nome: "João da Silva", idade: 72, genero: "Masculino", endereco: "Rua das Flores, 123", contato: "(11) 9999-9999",
-                rotina: [
-                    { hora: "08:00", acao: "Remédio Pressão", tipo: "med" },
-                    { hora: "12:00", acao: "Almoço", tipo: "food" }
-                ],
-                relatos: [
-                    { autor: "Filha", texto: "Hoje ele acordou bem disposto.", data: "20/04" }
-                ],
-                laudos: ["https://placehold.co/80x80/0062ff/white?text=Exame+1"]
-            }
-        ];
-        let pacienteAtual = null;
+        const app = {
+            state: {
+                userType: null,
+                activePacienteId: 0,
+                activeTab: 'prescricoes',
+                pacientes: [
+                    {
+                        id: 0,
+                        nome: "Augusto Ferreira",
+                        idade: 78,
+                        estagio: "Moderada",
+                        telefone: "(11) 98888-7766",
+                        cognicao: [24, 25, 23, 24, 22],
+                        prescricoes: [{ id: 1, medicamento: "Rivastigmina", dose: "4.5mg", hora: "08:00" }],
+                        checklist: [{ id: 101, tarefa: "Fisioterapia Respiratória", concluida: false, hora: "10:00" }],
+                        equipe: [{ id: 1, nome: "Dra. Ana Paula", cargo: "Fisioterapeuta" }],
+                        exames: [],
+                        mood: null // Armazena { icon, label, time }
+                    }
+                ]
+            },
 
-        function toggleLogin(tipo) {
-            modo = tipo;
-            document.getElementById('group-id').style.display = (tipo === 'paciente') ? 'flex' : 'none';
-            document.getElementById('btn-medico').classList.toggle('active', tipo === 'medico');
-            document.getElementById('btn-paciente').classList.toggle('active', tipo === 'paciente');
-        }
+            init() {
+                this.renderSelectors();
+            },
 
-        function fazerLogin() {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('dashboard-wrapper').style.display = 'block';
-            document.querySelector('.fundo-detalhes').style.display = 'block';
-            document.getElementById('user-tag').innerText = modo === 'medico' ? 'Médico Responsável' : 'Perfil Familiar';
-            
-            document.querySelectorAll('.section-medico').forEach(el => el.style.display = (modo === 'medico' ? 'block' : 'none'));
-            renderizarPacientes();
-        }
+            tryLogin(type) {
+                if (document.getElementById('login-pass').value === "1234") {
+                    this.state.userType = type;
+                    document.getElementById('login-overlay').classList.add('hidden-el');
+                    document.getElementById('main-nav').classList.remove('hidden-el');
+                    
+                    const badge = document.getElementById('badge-perfil');
+                    badge.innerText = type === 'medico' ? 'Médico Especialista' : 'Monitor/Cuidador';
+                    badge.className = `ml-4 px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-full ${type === 'medico' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`;
+                    
+                    this.refreshUI();
+                } else {
+                    this.showToast("Dica: Senha é 1234");
+                }
+            },
 
-        function renderizarPacientes() {
-            const container = document.getElementById('lista-pacientes');
-            container.innerHTML = pacientes.map(p => `
-                <div class="patient-card" onclick="selecionarPaciente('${p.id}')">
-                    <div class="p-avatar">${p.nome.substring(0,2).toUpperCase()}</div>
-                    <div><p><strong>${p.nome}</strong></p><small>${p.id}</small></div>
-                </div>
-            `).join('');
-        }
+            logout() {
+                this.state.userType = null;
+                document.getElementById('login-overlay').classList.remove('hidden-el');
+                document.getElementById('main-nav').classList.add('hidden-el');
+                document.getElementById('area-medico').classList.add('hidden-el');
+                document.getElementById('area-cuidador').classList.add('hidden-el');
+            },
 
-        function selecionarPaciente(id) {
-            pacienteAtual = pacientes.find(p => p.id === id);
-            document.getElementById('display-nome-paciente').innerText = pacienteAtual.nome;
-            document.getElementById('display-id-paciente').innerText = `Idade: ${pacienteAtual.idade} anos | ID: ${pacienteAtual.id}`;
-            
-            // Atualiza Rotina
-            const destaque = document.getElementById('atv-destaque');
-            destaque.innerHTML = pacienteAtual.rotina.length > 0 ? `<strong>${pacienteAtual.rotina[0].hora}</strong> - ${pacienteAtual.rotina[0].acao}` : "Sem tarefas";
-            
-            document.getElementById('timeline-completa').innerHTML = pacienteAtual.rotina.map(r => `
-                <div class="time-item ${r.tipo === 'med' ? 'med' : ''}"><span>${r.hora}</span> <p>${r.acao}</p></div>
-            `).join('');
+            getActive() {
+                return this.state.pacientes.find(p => p.id == this.state.activePacienteId);
+            },
 
-            // Relatos da Família
-            document.getElementById('feed-familia').innerHTML = pacienteAtual.relatos.map(r => `
-                <div class="relato-card"><small>${r.autor} • ${r.data}</small><p>${r.texto}</p></div>
-            `).join('');
+            switchPaciente(id) {
+                this.state.activePacienteId = parseInt(id);
+                this.refreshUI();
+            },
 
-            // Laudos
-            document.getElementById('historico-laudos').innerHTML = pacienteAtual.laudos.map(l => `<img src="${l}" class="thumb-laudo">`).join('');
-        }
+            refreshUI() {
+                const p = this.getActive();
+                if (this.state.userType === 'medico') {
+                    document.getElementById('area-medico').classList.remove('hidden-el');
+                    document.getElementById('area-cuidador').classList.add('hidden-el');
+                    this.renderMedicoUI();
+                } else {
+                    document.getElementById('area-cuidador').classList.remove('hidden-el');
+                    document.getElementById('area-medico').classList.add('hidden-el');
+                    document.getElementById('cuidador-paciente-nome').innerText = p.nome;
+                    document.getElementById('cuidador-paciente-info').innerText = `${p.idade} anos • Gravidade ${p.estagio}`;
+                    this.renderCuidadorUI();
+                }
+            },
 
-        function abrirRegistro(tipo) {
-            if(!pacienteAtual) return alert("Selecione um paciente!");
-            const titulo = document.getElementById('reg-titulo');
-            const form = document.getElementById('reg-form');
-            titulo.innerText = "Registrar " + tipo;
-            location.hash = "#modal-registro";
+            // RENDERIZAÇÃO MÉDICO
+            renderMedicoUI() {
+                const p = this.getActive();
+                const moodHtml = p.mood ? 
+                    `<div class="flex items-center space-x-2 mt-2 bg-indigo-50 p-2 rounded-xl">
+                        <span class="text-xl">${p.mood.icon}</span>
+                        <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-tighter">${p.mood.label} às ${p.mood.time}</span>
+                    </div>` : 
+                    `<p class="text-[9px] font-bold text-slate-300 mt-2 italic uppercase">Sem reporte de humor</p>`;
 
-            let html = "";
-            if(tipo === 'Alimentação') {
-                html = `<input type="text" id="r-1" placeholder="O que ele comeu?"><select id="r-2"><option>Comeu tudo</option><option>Parcial</option><option>Recusou</option></select>`;
-            } else if(tipo === 'Pressão') {
-                html = `<div class="row"><input type="number" id="r-1" placeholder="Sistólica (12)"><input type="number" id="r-2" placeholder="Diastólica (8)"></div>`;
-            } else if(tipo === 'Hidratação') {
-                html = `<input type="number" id="r-1" placeholder="Quantidade em ml (ex: 300)">`;
-            } else {
-                html = `<textarea id="r-1" rows="4" placeholder="Escreva os detalhes aqui..."></textarea>`;
-            }
-            form.innerHTML = html + `<button type="button" class="btn-save" onclick="salvarRelato('${tipo}')">Salvar Registro</button>`;
-        }
+                document.getElementById('medico-stats').innerHTML = `
+                    <div class="bg-white p-6 rounded-[2rem] border-l-4 border-indigo-500 card-shadow">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Humor Recente</p>
+                        ${moodHtml}
+                    </div>
+                    <div class="bg-white p-6 rounded-[2rem] border-l-4 border-indigo-500 card-shadow">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contato Emergência</p>
+                        <h4 class="text-sm font-black text-indigo-600 mt-1">${p.telefone}</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-[2rem] border-l-4 border-emerald-500 card-shadow">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Status Geral</p>
+                        <h4 class="text-sm font-black text-emerald-600 mt-1">Estável</h4>
+                    </div>
+                `;
 
-        function salvarRelato(tipo) {
-            const val1 = document.getElementById('r-1').value;
-            const texto = tipo === 'Pressão' ? `Pressão: ${val1}/${document.getElementById('r-2').value}` : val1;
-            
-            pacienteAtual.relatos.unshift({
-                autor: modo === 'medico' ? 'Médico' : 'Família',
-                texto: `${tipo}: ${texto}`,
-                data: "Hoje"
-            });
-            location.hash = "";
-            selecionarPaciente(pacienteAtual.id);
-        }
+                this.renderPrescricoes(p);
+                this.renderExames(p);
+                this.renderRotinaMedico(p);
+                this.renderEquipeMedico(p);
+                this.initChart(p);
+            },
 
-        function salvarNovoPaciente() {
-            const novo = {
-                id: "VIVA-" + Math.floor(1000 + Math.random()*9000),
-                nome: document.getElementById('cad-nome').value,
-                idade: document.getElementById('cad-idade').value,
-                genero: document.getElementById('cad-genero').value,
-                rotina: [], relatos: [], laudos: []
-            };
-            pacientes.push(novo);
-            location.hash = "";
-            renderizarPacientes();
-        }
+            // RENDERIZAÇÃO CUIDADOR
+            renderCuidadorUI() {
+                const p = this.getActive();
+                
+                // Atualiza Seleção de Humor
+                document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('active'));
+                const statusDiv = document.getElementById('mood-status');
+                if (p.mood) {
+                    statusDiv.classList.remove('hidden-el');
+                    document.getElementById('mood-label').innerText = `${p.mood.icon} ${p.mood.label} (${p.mood.time})`;
+                    // Tenta achar o botão se for um dos padrões
+                    const btnId = `mood-${p.mood.type}`;
+                    const btn = document.getElementById(btnId);
+                    if(btn) btn.classList.add('active');
+                } else {
+                    statusDiv.classList.add('hidden-el');
+                }
 
-        function adicionarTarefa() {
-            pacienteAtual.rotina.push({
-                hora: document.getElementById('rot-hora').value,
-                acao: document.getElementById('rot-atv').value,
-                tipo: document.getElementById('rot-tipo').value
-            });
-            pacienteAtual.rotina.sort((a,b) => a.hora.localeCompare(b.hora));
-            location.hash = "";
-            selecionarPaciente(pacienteAtual.id);
-        }
+                // Checklist e outros
+                document.getElementById('cuidador-checklist').innerHTML = [...p.checklist].sort((a,b) => a.hora.localeCompare(b.hora)).map(i => `
+                    <div class="flex items-center justify-between p-5 rounded-[2rem] border-2 transition-all ${i.concluida ? 'bg-slate-50 border-slate-50 opacity-60' : 'bg-white border-indigo-50 shadow-sm'}">
+                        <div class="flex items-center space-x-4">
+                            <button onclick="app.toggleCheck(${i.id})" class="w-12 h-12 rounded-2xl border-2 flex items-center justify-center transition-all ${i.concluida ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-indigo-100 text-indigo-100 hover:border-indigo-500'}"><i class="fas fa-check"></i></button>
+                            <div>
+                                <p class="font-bold text-sm ${i.concluida ? 'text-slate-400 line-through' : 'text-slate-700'}">${i.tarefa}</p>
+                                <span class="text-[9px] font-black text-indigo-400 tracking-widest uppercase">${i.hora}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
 
-        function previewFile(input) {
-            const container = document.getElementById('preview-container');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    container.innerHTML = `<img src="${e.target.result}" class="img-preview">`;
-                    pacienteAtual.laudos.push(e.target.result);
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+                document.getElementById('cuidador-exames-lista').innerHTML = p.exames.map(ex => `
+                    <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                        <i class="fas fa-file-alt text-slate-400"></i>
+                        <div class="flex-1 overflow-hidden"><p class="text-[10px] font-black text-slate-800 truncate">${ex.nome}</p></div>
+                        <button onclick="app.removeExame(${ex.id})" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
+                    </div>
+                `).join('');
+
+                document.getElementById('cuidador-equipe-lista').innerHTML = p.equipe.map(m => `
+                    <div class="flex items-center space-x-3 p-4 bg-slate-50 rounded-2xl">
+                        <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-indigo-500 shadow-sm"><i class="fas fa-stethoscope text-[10px]"></i></div>
+                        <div><p class="text-[10px] font-black text-slate-700">${m.nome}</p><p class="text-[8px] font-bold text-slate-400 uppercase">${m.cargo}</p></div>
+                    </div>
+                `).join('');
+
+                const done = p.checklist.filter(i => i.concluida).length;
+                document.getElementById('progresso-diario').innerText = `${done}/${p.checklist.length} concluídos hoje`;
+            },
+
+            // NOVAS AÇÕES DE HUMOR
+            selectMood(type, icon, label) {
+                const p = this.getActive();
+                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                p.mood = { type, icon, label, time: now };
+                this.renderCuidadorUI();
+                this.showToast(`Humor "${label}" registrado!`);
+            },
+
+            // AÇÕES PADRÃO (Legadas do arquivo anterior)
+            addPaciente(e) {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const novoId = Date.now();
+                this.state.pacientes.push({
+                    id: novoId,
+                    nome: fd.get('nome'),
+                    idade: fd.get('idade'),
+                    estagio: fd.get('estagio'),
+                    telefone: fd.get('telefone'),
+                    cognicao: [30],
+                    prescricoes: [],
+                    checklist: [],
+                    equipe: [],
+                    exames: [],
+                    mood: null
+                });
+                this.renderSelectors();
+                this.state.activePacienteId = novoId;
+                this.closeModal();
+                this.refreshUI();
+                this.showToast("Paciente cadastrado!");
+                e.target.reset();
+            },
+
+            addPrescricao(e) {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const p = this.getActive();
+                const med = fd.get('med');
+                const hora = fd.get('hora');
+                p.prescricoes.push({ id: Date.now(), medicamento: med, dose: fd.get('dose'), hora: hora });
+                p.checklist.push({ id: Date.now()+1, tarefa: `Medicamento: ${med}`, concluida: false, hora: hora });
+                this.closeModal(); this.refreshUI(); this.showToast("Medicação prescrita!");
+            },
+
+            addMember(e) {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const p = this.getActive();
+                p.equipe.push({ id: Date.now(), nome: fd.get('nome'), cargo: fd.get('cargo') });
+                this.closeModal(); this.renderEquipeMedico(p); this.showToast("Membro adicionado!");
+                e.target.reset();
+            },
+
+            addExame(e) {
+                e.preventDefault();
+                const p = this.getActive();
+                p.exames.unshift({ id: Date.now(), nome: document.getElementById('exame-nome').value, data: document.getElementById('exame-data').value });
+                e.target.reset(); this.renderCuidadorUI(); this.showToast("Exame enviado!");
+            },
+
+            addTask(e) {
+                e.preventDefault();
+                const p = this.getActive();
+                p.checklist.push({ id: Date.now(), tarefa: document.getElementById('task-name').value, concluida: false, hora: document.getElementById('task-time').value });
+                e.target.reset(); this.renderMedicoUI(); this.showToast("Atividade agendada!");
+            },
+
+            toggleCheck(id) {
+                const p = this.getActive();
+                const i = p.checklist.find(x => x.id === id);
+                i.concluida = !i.concluida; this.renderCuidadorUI();
+            },
+
+            renderPrescricoes(p) {
+                document.getElementById('medico-prescricoes-body').innerHTML = p.prescricoes.map(pr => `
+                    <tr>
+                        <td class="py-4 font-bold text-sm text-slate-700">${pr.medicamento}</td>
+                        <td class="py-4 text-xs font-medium text-slate-500">${pr.dose}</td>
+                        <td class="py-4 text-xs font-black text-slate-400">${pr.hora}</td>
+                        <td class="py-4"><button onclick="app.removePres(${pr.id})" class="text-slate-300 hover:text-red-500"><i class="fas fa-minus-circle"></i></button></td>
+                    </tr>
+                `).join('') || '<tr><td colspan="4" class="py-10 text-center text-xs text-slate-400 italic">Sem prescrições</td></tr>';
+            },
+
+            renderExames(p) {
+                document.getElementById('medico-exames-lista').innerHTML = p.exames.map(ex => `
+                    <div class="bg-slate-50 p-5 rounded-3xl border border-slate-200">
+                        <div class="flex justify-between mb-3"><i class="fas fa-file-medical text-indigo-500"></i><span class="text-[9px] font-black text-slate-300">${ex.data}</span></div>
+                        <h5 class="font-black text-slate-800 text-xs">${ex.nome}</h5>
+                    </div>
+                `).join('') || '<p class="col-span-full text-center py-10 text-slate-300 text-[10px] font-black uppercase">Aguardando exames...</p>';
+            },
+
+            renderRotinaMedico(p) {
+                document.getElementById('medico-rotina-lista').innerHTML = p.checklist.map(t => `
+                    <div class="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl">
+                        <div><p class="text-sm font-bold text-slate-700">${t.tarefa}</p><span class="text-[9px] font-black text-indigo-400 uppercase">${t.hora}</span></div>
+                        <button onclick="app.removeTask(${t.id})" class="text-slate-200 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </div>
+                `).join('');
+            },
+
+            renderEquipeMedico(p) {
+                document.getElementById('medico-equipe-lista').innerHTML = p.equipe.map(m => `
+                    <div class="group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl hover:border-indigo-200 transition-all">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600"><i class="fas fa-user-md"></i></div>
+                            <div><p class="text-sm font-bold text-slate-700">${m.nome}</p><span class="text-[9px] font-black text-slate-400 uppercase">${m.cargo}</span></div>
+                        </div>
+                        <button onclick="app.removeMember(${m.id})" class="text-slate-200 hover:text-red-500 opacity-0 group-hover:opacity-100"><i class="fas fa-times"></i></button>
+                    </div>
+                `).join('') || '<p class="col-span-full text-center py-6 text-slate-300 text-xs font-bold italic uppercase">Sem equipe vinculada</p>';
+            },
+
+            removePres(id) { const p = this.getActive(); p.prescricoes = p.prescricoes.filter(x => x.id !== id); this.renderPrescricoes(p); },
+            removeTask(id) { const p = this.getActive(); p.checklist = p.checklist.filter(x => x.id !== id); this.renderRotinaMedico(p); },
+            removeExame(id) { const p = this.getActive(); p.exames = p.exames.filter(x => x.id !== id); this.renderCuidadorUI(); },
+            removeMember(id) { const p = this.getActive(); p.equipe = p.equipe.filter(x => x.id !== id); this.renderEquipeMedico(p); },
+
+            renderSelectors() {
+                const s = document.getElementById('select-global-paciente');
+                s.innerHTML = this.state.pacientes.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+            },
+
+            switchTab(tab) {
+                document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden-el'));
+                document.querySelectorAll('button[id^="tab-"]').forEach(t => t.classList.remove('tab-active'));
+                document.getElementById(`view-${tab}`).classList.remove('hidden-el');
+                document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            },
+
+            initChart(p) {
+                const ctx = document.getElementById('evolucaoChart').getContext('2d');
+                if (this.state.chart) this.state.chart.destroy();
+                this.state.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: p.cognicao.map((_, i) => `Mês ${i+1}`),
+                        datasets: [{
+                            label: 'Pontuação MMSE',
+                            data: p.cognicao,
+                            borderColor: '#6366f1',
+                            borderWidth: 4,
+                            pointRadius: 6,
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(99, 102, 241, 0.05)'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 30 } } }
+                });
+            },
+
+            openModal(id) { document.getElementById('modal-container').classList.remove('hidden-el'); document.getElementById(id).classList.remove('hidden-el'); },
+            closeModal() { document.getElementById('modal-container').classList.add('hidden-el'); document.querySelectorAll('#modal-container > div').forEach(m => m.classList.add('hidden-el')); },
+            showToast(m) { const t = document.getElementById('toast'); document.getElementById('toast-text').innerText = m; t.classList.remove('hidden-el'); setTimeout(() => t.classList.add('hidden-el'), 3000); }
+        };
+
+        window.onload = () => app.init();
     </script>
 </body>
 </html>
