@@ -27,7 +27,6 @@
 </head>
 <body class="bg-[#f8fafc] min-h-screen text-slate-900">
 
-    <!-- LOGIN OVERLAY -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] p-10 max-w-md w-full text-center shadow-2xl border border-slate-100">
             <div class="mb-8">
@@ -58,12 +57,10 @@
                         Cuidador
                     </button>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-4 font-medium italic">Acesso rápido: senha "1234"</p>
             </div>
         </div>
     </div>
 
-    <!-- HEADER -->
     <nav id="main-nav" class="hidden-el bg-white/80 glass border-b border-slate-100 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex justify-between h-20 items-center">
@@ -91,7 +88,6 @@
 
     <main class="max-w-7xl mx-auto p-6 lg:p-10">
         
-        <!-- ÁREA DO MÉDICO -->
         <div id="area-medico" class="hidden-el space-y-8 animate-pop">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -165,7 +161,6 @@
             </div>
         </div>
 
-        <!-- ÁREA DO CUIDADOR -->
         <div id="area-cuidador" class="hidden-el space-y-8 animate-pop">
             <div id="banner-cuidador" class="bg-gradient-to-br from-indigo-600 to-violet-800 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
                 <div class="relative z-10">
@@ -176,7 +171,6 @@
                 <i class="fas fa-heartbeat absolute right-[-20px] bottom-[-20px] text-white/10 text-[200px]"></i>
             </div>
 
-            <!-- Registro de Humor (NOVO) -->
             <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="font-black text-xl text-slate-800">Como está o paciente agora?</h3>
@@ -206,10 +200,15 @@
 
                     <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
                         <h3 class="font-black text-2xl text-slate-800 mb-6">Anexar Resultados</h3>
-                        <form onsubmit="app.addExame(event)" class="flex flex-col md:flex-row gap-4">
-                            <input type="text" id="exame-nome" required placeholder="Título do Exame" class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
-                            <input type="date" id="exame-data" required class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
-                            <button type="submit" class="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700">Anexar</button>
+                        <form onsubmit="app.addExame(event)" class="flex flex-col gap-4">
+                            <div class="flex flex-col md:flex-row gap-4">
+                                <input type="text" id="exame-nome" required placeholder="Título do Exame" class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                                <input type="date" id="exame-data" required class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 font-bold text-sm">
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-4 items-center">
+                                <input type="file" id="exame-arquivo" required class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 font-bold text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 cursor-pointer">
+                                <button type="submit" class="w-full md:w-auto bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700 shrink-0">Anexar</button>
+                            </div>
                         </form>
                         <div id="cuidador-exames-lista" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                     </div>
@@ -229,10 +228,8 @@
         </div>
     </main>
 
-    <!-- MODAIS -->
     <div id="modal-container" class="hidden-el fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
         
-        <!-- Modal Novo Paciente -->
         <div id="modal-novo-paciente" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-lg p-10 animate-pop">
             <h3 class="text-3xl font-black mb-2 text-slate-800">Novo Paciente</h3>
             <p class="text-slate-400 text-sm mb-8 font-medium">Inicie o registro do novo prontuário.</p>
@@ -266,7 +263,6 @@
             </form>
         </div>
 
-        <!-- Modal Prescrição -->
         <div id="modal-prescricao" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop">
             <h3 class="text-2xl font-black mb-6">Prescrever</h3>
             <form onsubmit="app.addPrescricao(event)" class="space-y-4">
@@ -279,7 +275,6 @@
             </form>
         </div>
 
-        <!-- Modal Equipe -->
         <div id="modal-equipe" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop">
             <h3 class="text-2xl font-black mb-6">Adicionar Profissional</h3>
             <form onsubmit="app.addMember(event)" class="space-y-4">
@@ -296,7 +291,6 @@
             </form>
         </div>
 
-        <!-- Modal Reação -->
         <div id="modal-reacao" class="hidden-el bg-white rounded-[2.5rem] w-full max-w-md p-8 animate-pop">
             <h3 class="text-2xl font-black text-red-600 mb-6 text-center">Aviso de Emergência</h3>
             <form onsubmit="app.sendIntercorrencia(event)" class="space-y-4">
@@ -312,7 +306,6 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div id="toast" class="hidden-el fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl flex items-center animate-pop">
         <i class="fas fa-info-circle text-indigo-400 mr-3"></i>
         <span id="toast-text" class="text-xs font-black uppercase tracking-widest"></span>
@@ -346,7 +339,7 @@
             },
 
             tryLogin(type) {
-                if (document.getElementById('login-pass').value === "1234") {
+                if (document.getElementById('login-pass').value.trim() !== "") {
                     this.state.userType = type;
                     document.getElementById('login-overlay').classList.add('hidden-el');
                     document.getElementById('main-nav').classList.remove('hidden-el');
@@ -357,7 +350,7 @@
                     
                     this.refreshUI();
                 } else {
-                    this.showToast("Dica: Senha é 1234");
+                    this.showToast("Por favor, digite uma senha.");
                 }
             },
 
@@ -595,6 +588,18 @@
             removeTask(id) { const p = this.getActive(); p.checklist = p.checklist.filter(x => x.id !== id); this.renderRotinaMedico(p); },
             removeExame(id) { const p = this.getActive(); p.exames = p.exames.filter(x => x.id !== id); this.renderCuidadorUI(); },
             removeMember(id) { const p = this.getActive(); p.equipe = p.equipe.filter(x => x.id !== id); this.renderEquipeMedico(p); },
+            
+            sendIntercorrencia(e) {
+                e.preventDefault();
+                const tipo = document.getElementById('inc-tipo').value;
+                const desc = document.getElementById('inc-desc').value;
+                const p = this.getActive();
+                if (!p.incidentes) p.incidentes = [];
+                p.incidentes.push({ id: Date.now(), tipo, desc, data: new Date().toLocaleDateString() });
+                this.closeModal();
+                this.showToast(`Incidente (${tipo}) enviado com sucesso!`);
+                document.getElementById('inc-desc').value = '';
+            },
 
             renderSelectors() {
                 const s = document.getElementById('select-global-paciente');
